@@ -1,8 +1,14 @@
 package com.example.springshopee.servive;
 
+import com.example.springshopee.dto.GetAllProductDto;
+import com.example.springshopee.entity.Account;
 import com.example.springshopee.entity.Product;
+import com.example.springshopee.exception.ApiException;
+import com.example.springshopee.helper.jwtdecode.JwtUtil;
+import com.example.springshopee.model.Session;
 import com.example.springshopee.repository.AccountRepository;
 import com.example.springshopee.repository.ProductRepository;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,6 +22,9 @@ public class ProductService {
 
     @Autowired
     AccountRepository accountRepository;
+
+    @Autowired
+    SessionService sessionService;
 
     public List<Product> getAllProduct(){
         try{
@@ -81,5 +90,23 @@ public class ProductService {
         }catch (Exception ex){
             return false;
         }
+    }
+
+    public GetAllProductDto getAllProductDto(String token){
+        Claims userId = JwtUtil.verifyToken(token);
+        Account account = accountRepository.getAccountById((String) userId.get("userId"));
+        List<Product> products = productRepository.getAllProduct();
+        return new GetAllProductDto(products, account);
+    }
+
+    public GetAllProductDto getAllProductDto1(String token) throws ApiException{
+        Session session = sessionService.getSessionByToken(token);
+        if(session == null){
+            throw new ApiException("Token khong hop le!!");
+        }
+        String userId = session.getUserId();
+        Account account = accountRepository.getAccountById(userId);
+        List<Product> products = productRepository.getAllProduct();
+        return new GetAllProductDto(products, account);
     }
 }

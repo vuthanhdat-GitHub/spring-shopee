@@ -21,7 +21,7 @@ public class AccountController {
 
     @GetMapping("/getAllAccountById")
     public Account getAllAccountById(String id){
-        return accountService.GetAllAccountById(id);
+        return accountService.getAllAccountById(id);
     }
 
     @PostMapping("/addAccount")

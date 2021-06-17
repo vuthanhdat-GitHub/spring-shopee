@@ -1,12 +1,15 @@
 package com.example.springshopee.controller;
 
+import com.example.springshopee.dto.GetAllProductDto;
 import com.example.springshopee.entity.Product;
+import com.example.springshopee.exception.ApiException;
 import com.example.springshopee.servive.AccountService;
 import com.example.springshopee.servive.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
@@ -62,5 +65,16 @@ public class ProductController {
     @RequestMapping("/deleteProduct")
     public Boolean deleteProduct(@PathVariable("id") String id){
         return productService.deletedProduct(id);
+    }
+
+    @RequestMapping("/getAllProductDto")
+    public GetAllProductDto getAllProductDto(HttpServletRequest request){
+        String token = request.getHeader("token");
+        return productService.getAllProductDto(token);
+    }
+
+    @RequestMapping("/getAllProductDto1")
+    public GetAllProductDto getAllProductDto(@RequestParam String token, HttpServletRequest request) throws ApiException {
+        return productService.getAllProductDto1(token);
     }
 }
