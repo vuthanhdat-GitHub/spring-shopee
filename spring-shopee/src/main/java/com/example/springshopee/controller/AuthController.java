@@ -4,8 +4,10 @@ import com.example.springshopee.dto.login.LoginRequestDto;
 import com.example.springshopee.dto.login.LoginResponseDto;
 import com.example.springshopee.entity.Account;
 import com.example.springshopee.exception.ApiException;
+import com.example.springshopee.helper.jwtdecode.JwtUtil;
 import com.example.springshopee.servive.AccountService;
 import com.example.springshopee.servive.SessionService;
+import com.example.springshopee.servive.redisService.RedisServiceProduct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,20 +23,22 @@ public class AuthController {
     AccountService accountService;
     @Autowired
     SessionService sessionService;
+    @Autowired
+    RedisServiceProduct redisServiceProduct;
 
     @PostMapping("/login")
-    public LoginResponseDto loginResponseDto(@RequestBody LoginRequestDto loginRequestDto) throws ApiException{
+    public String loginResponseDto(@RequestBody LoginRequestDto loginRequestDto) throws ApiException{
         Account account = accountService.getAllAccountByEmailAndPasswordAccount(loginRequestDto.getEmail(), loginRequestDto.getPassword());
         if(account == null){
             throw new ApiException("Sai tai khoan hoac mat khau");
         }
         String accountId = account.getAccountID();
-        String token = UUID.randomUUID().toString();
-        Boolean createSessionResult = sessionService.createSession(accountId, token);
-        if(createSessionResult){
-            return new LoginResponseDto(token);
-        }else{
-            throw new ApiException("Dang nhap that bai, thu lai sau!");
-        }
+        String token = JwtUtil.generateToken(accountId, account.getRole());
+//        try{
+//            redisServiceProduct.scheduleFixedRateTaskAsync();
+//        }catch (Exception ex){
+//            ex.printStackTrace();
+//        }
+        return token;
     }
 }

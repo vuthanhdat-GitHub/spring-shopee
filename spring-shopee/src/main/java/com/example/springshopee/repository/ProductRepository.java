@@ -15,7 +15,7 @@ public class ProductRepository {
     JdbcTemplate jdbcTemplate;
 
     public List<Product> getAllProduct(){
-        String sql = "Select * from where deleted = 0;";
+        String sql = "Select * from Product where deleted = 0;";
         List<Product> list = jdbcTemplate.query(sql, new ProductMapper());
         return list;
     }
