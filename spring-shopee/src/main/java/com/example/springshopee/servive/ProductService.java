@@ -1,5 +1,6 @@
 package com.example.springshopee.servive;
 
+import com.example.springshopee.builder.ProductBuilder;
 import com.example.springshopee.dto.GetAllProductDto;
 import com.example.springshopee.entity.Account;
 import com.example.springshopee.entity.Product;
@@ -7,7 +8,7 @@ import com.example.springshopee.exception.ApiException;
 import com.example.springshopee.helper.jwtdecode.JwtUtil;
 import com.example.springshopee.model.Session;
 import com.example.springshopee.repository.AccountRepository;
-import com.example.springshopee.repository.ProductRepository;
+import com.example.springshopee.repository.ProductRepositoryCustom;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ import java.util.List;
 @Service
 public class ProductService {
     @Autowired
-    ProductRepository productRepository;
+    ProductRepositoryCustom productRepositoryCustom;
 
     @Autowired
     AccountRepository accountRepository;
@@ -28,7 +29,15 @@ public class ProductService {
 
     public List<Product> getAllProduct(){
         try{
-            return productRepository.getAllProduct();
+            return productRepositoryCustom.getAllProduct();
+        }catch (Exception ex){
+            return null;
+        }
+    }
+
+    public List<Product> getAllProduct(ProductBuilder productBuilder){
+        try{
+            return productRepositoryCustom.getAllProductBuilder(productBuilder);
         }catch (Exception ex){
             return null;
         }
@@ -36,7 +45,7 @@ public class ProductService {
 
     public List<Product> getAllProductTypeSort(String type, int sort){
         try{
-            return productRepository.getAllProductTypeSort(type, sort);
+            return productRepositoryCustom.getAllProductTypeSort(type, sort);
         }catch (Exception ex){
             return null;
         }
@@ -46,7 +55,7 @@ public class ProductService {
         try{
             Integer limit = size;
             Integer offset = (page - 1) * size;
-            return productRepository.getAllProductLimitOffset(limit, offset);
+            return productRepositoryCustom.getAllProductLimitOffset(limit, offset);
         }catch (Exception ex){
             return null;
         }
@@ -54,7 +63,7 @@ public class ProductService {
 
     public Product getAllProductById(@RequestParam String id){
         try{
-            return productRepository.getAllProductById(id);
+            return productRepositoryCustom.getAllProductById(id);
         }catch (Exception ex){
             return null;
         }
@@ -62,7 +71,7 @@ public class ProductService {
 
     public Integer countProduct(){
         try{
-            return productRepository.countProduct();
+            return productRepositoryCustom.countProduct();
         }catch (Exception ex){
             return null;
         }
@@ -70,7 +79,7 @@ public class ProductService {
 
     public Boolean addProduct(Product product){
         try{
-            return productRepository.addProduct(product);
+            return productRepositoryCustom.addProduct(product);
         }catch (Exception ex){
             return false;
         }
@@ -78,7 +87,7 @@ public class ProductService {
 
     public Boolean updateProduct(Product product){
         try{
-            return productRepository.updateProduct(product);
+            return productRepositoryCustom.updateProduct(product);
         }catch (Exception ex){
             return false;
         }
@@ -86,17 +95,20 @@ public class ProductService {
 
     public Boolean deletedProduct(String id){
         try{
-            return productRepository.deletedProduct(id);
+            return productRepositoryCustom.deletedProduct(id);
         }catch (Exception ex){
             return false;
         }
     }
 
     public GetAllProductDto getAllProductDto(String token){
-        Claims userId = JwtUtil.verifyToken(token);
+        Claims userId = JwtUtil.getAllClaimsFromToken(token);
         Account account = accountRepository.getAccountById((String) userId.get("userId"));
-        List<Product> products = productRepository.getAllProduct();
-        return new GetAllProductDto(products, account);
+        List<Product> products = productRepositoryCustom.getAllProduct();
+//      System.out.println(products);
+        GetAllProductDto getAllProductDto = new GetAllProductDto(products, account);
+        System.out.println(getAllProductDto);
+        return getAllProductDto;
     }
 
     public GetAllProductDto getAllProductDto1(String token) throws ApiException{
@@ -106,7 +118,7 @@ public class ProductService {
         }
         String userId = session.getUserId();
         Account account = accountRepository.getAccountById(userId);
-        List<Product> products = productRepository.getAllProduct();
+        List<Product> products = productRepositoryCustom.getAllProduct();
         return new GetAllProductDto(products, account);
     }
 }

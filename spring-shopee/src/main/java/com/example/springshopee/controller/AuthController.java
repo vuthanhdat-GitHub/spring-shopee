@@ -39,6 +39,7 @@ public class AuthController {
 //        }catch (Exception ex){
 //            ex.printStackTrace();
 //        }
+        System.out.println(token);
         return token;
     }
 }

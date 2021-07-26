@@ -26,8 +26,10 @@ public class RedisServiceProduct {
             throw new ApiException("bug setProduct");
         }
     }
+    static int i = 0;
     @Scheduled(fixedRate =  360000)
     public void scheduleFixedRateTaskAsync() throws ApiException{
+        System.out.println(i++);
         List<Product> list = productService.getAllProduct();
         for(Product temp : list) {
             redisServiceProduct.setProduct(temp);

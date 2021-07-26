@@ -1,5 +1,6 @@
 package com.example.springshopee.controller;
 
+import com.example.springshopee.builder.ProductBuilder;
 import com.example.springshopee.dto.GetAllProductDto;
 import com.example.springshopee.entity.Product;
 import com.example.springshopee.exception.ApiException;
@@ -13,26 +14,29 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/product")
 public class ProductController {
     @Autowired
     ProductService productService;
 
-    @RequestMapping("/getAllProduct")
-    public List<Product> getAllProduct(@RequestHeader int token){
-        if(!AccountService.ListLogin.containsKey(token)){
-            return null;
-        }
-        return productService.getAllProduct();
+    @GetMapping("/getAllProduct")
+    public List<Product> getAllProduct(@RequestHeader String token
+            , @RequestParam("display") String display){
+
+//        if(!AccountService.ListLogin.containsKey(token)){
+//            return null;
+//        }
+        ProductBuilder builder = initBuilder(display);
+        return productService.getAllProduct(builder);
     }
 
-    @RequestMapping("/getAllProductTypeSort")
+    @GetMapping("/getAllProductTypeSort")
     public List<Product> getAllProductTypeSort(@RequestParam String type, @RequestParam int sort){
         return productService.getAllProductTypeSort(type, sort);
     }
 
-    @RequestMapping("/getAllProductLimitOffset")
+    @GetMapping("/getAllProductLimitOffset")
     public List<Product> getAllProductLimitOffset(@RequestParam(required = false) Integer size, @RequestParam(required = false) Integer page){
         if(size == null){
             size = 10;
@@ -43,39 +47,53 @@ public class ProductController {
         return productService.getAllProductLimitOffset(size, page);
     }
 
-    @RequestMapping("/getAllProductById")
+    @GetMapping("/getAllProductById")
     public Product getAllProductById(@RequestParam String id){
         return productService.getAllProductById(id);
     }
 
-    @RequestMapping("/countProduct")
+    @GetMapping("/countProduct")
     public Integer countProduct(){
         return productService.countProduct();
     }
 
-    @RequestMapping("/addProduct")
+    @GetMapping("/addProduct")
     public Boolean addProduct(@RequestBody Product product){
         return productService.addProduct(product);
     }
 
-    @RequestMapping("/updateProduct/{id}")
+    @PutMapping("/updateProduct/{id}")
     public Boolean updateProduct(@PathVariable("id") String id, @RequestBody Product product){
         return productService.updateProduct(product);
     }
 
-    @RequestMapping("/deleteProduct")
+    @DeleteMapping("/deleteProduct")
     public Boolean deleteProduct(@PathVariable("id") String id){
         return productService.deletedProduct(id);
     }
 
-    @RequestMapping("/getAllProductDto")
+
+    @GetMapping("/getAllProductDto")
     public GetAllProductDto getAllProductDto(HttpServletRequest request){
         String token = request.getHeader("token");
+//      System.out.println(token);
+        System.out.println(productService.getAllProductDto(token));
+
         return productService.getAllProductDto(token);
     }
 
-    @RequestMapping("/getAllProductDto1")
+    @GetMapping("/getAllProductDto1")
     public GetAllProductDto getAllProductDto(@RequestParam String token, HttpServletRequest request) throws ApiException {
         return productService.getAllProductDto1(token);
+    }
+    @GetMapping("/test")
+    public String test(@RequestParam String str){
+        return str;
+    }
+
+    private ProductBuilder initBuilder(String display){
+        return new ProductBuilder.builder()
+                .setDisplay(display)
+                .builder();
     }
 }

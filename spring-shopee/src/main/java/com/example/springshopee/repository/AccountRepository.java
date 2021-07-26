@@ -15,19 +15,19 @@ public class AccountRepository {
     JdbcTemplate jdbcTemplate;
 
     public List<Account> getAllAccount(){
-        String sql = "Select * from Account where deleted = 0;";
+        String sql = "SELECT  * FROM Account WHERE deleted = 0;";
         List<Account> list = jdbcTemplate.query(sql, new AccountMapper());
         return list;
     }
 
     public Account getAccountById(String id){
-        String sql = "Select * from Account where AccountID = ? and deleted = 0;";
+        String sql = "SELECT  * FROM Account WHERE AccountID = ? and deleted = 0;";
         Account account = (Account) jdbcTemplate.queryForObject(sql, new AccountMapper(), new Object[]{id});
         return account;
     }
 
     public Account getAccountByEmailAndPassword(String email, String password){
-        String sql = "Select * from Account where email = ? and password = ? limit 1;";
+        String sql = "SELECT  * FROM Account WHERE email = ? and password = ? limit 1;";
         Account account = (Account) jdbcTemplate.queryForObject(sql, new AccountMapper(), new Object[]{email, password});
         return account;
     }
